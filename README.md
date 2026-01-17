@@ -1,13 +1,12 @@
 # 🏓 Pong with Centrifugo
-
-**Play now:** https://pong.stabalmo.pro
-**Created by:** [Danila Alferov](https://www.linkedin.com/in/stabalmo)
-
 <p align="center">
   <a href="https://pong.stabalmo.pro">
     <img src="./preview-game.gif" alt="Pong gameplay preview" width="720" />
   </a>
+  <a>✅ pong.stabalmo.pro</a>
 </p>
+
+
 
 ## ✨ Features
 
@@ -59,6 +58,11 @@
 ### Start Services
 
 ```bash
+# Clone required repos
+git clone https://github.com/PongCentrifugo/iac
+git clone https://github.com/PongCentrifugo/backend
+git clone https://github.com/PongCentrifugo/frontend
+
 # 1. Redis
 cd iac/redis
 docker-compose up -d
@@ -70,13 +74,13 @@ cp config.example.json config.json
 docker-compose up -d
 
 # 3. Backend
-cd ../../pong-backend
+cd ../../backend
 cp .env.example .env
 # Match secrets with Centrifugo
 docker-compose up -d
 
 # 4. Frontend
-cd ../pong-frontend
+cd ../frontend
 npm install
 npm run dev
 ```
@@ -201,19 +205,22 @@ All cases → Lobby resets, history cleared.
 - **Centrifugo:** `http://localhost:8000/` (admin panel)
 - **Redis:** `docker exec pong-redis redis-cli MONITOR`
 
-If you like this project, please ⭐ the repo, follow it, and follow my GitHub: [@Stabalmo](https://github.com/Stabalmo).
+
 
 ---
 
 ## 📝 License
 
-See [MIT License](../../LICENSE).
+See [MIT License](./LICENSE).
 
 ---
 
 ## 🤝 Contributing
 
 Pull requests welcome! For major changes, open an issue first.
+If you like this project, please ⭐ the repo, follow it, and follow my GitHub: [@Stabalmo](https://github.com/Stabalmo).
+
+**Created by:** [Danila Alferov](https://www.linkedin.com/in/stabalmo)
 
 ---
 
