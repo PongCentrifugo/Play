@@ -3,7 +3,7 @@
   <a href="https://pong.stabalmo.pro">
     <img src="./preview-game.gif" alt="Pong gameplay preview" width="720" />
   </a>
-  <a>✅ pong.stabalmo.pro</a>
+  <a href="https://pong.stabalmo.pro">pong.stabalmo.pro</a>
 </p>
 
 
