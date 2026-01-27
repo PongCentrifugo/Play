@@ -1,227 +1,68 @@
-# 🏓 Pong with Centrifugo
+# Pong with Centrifugo
+
+![AWS](https://img.shields.io/badge/AWS-232F3E?style=flat&logo=amazonwebservices&logoColor=white)
+![Amazon EKS](https://img.shields.io/badge/EKS-FF9900?style=flat&logo=amazoneks&logoColor=white)
+![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=flat&logo=terraform&logoColor=white)
+![ArgoCD](https://img.shields.io/badge/ArgoCD-EF7B4D?style=flat&logo=argo&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
+![Go](https://img.shields.io/badge/Go-00ADD8?style=flat&logo=go&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
+![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat&logo=redis&logoColor=white)
+
+A real-time multiplayer Pong game built with Centrifugo WebSocket server, Go backend, and vanilla JavaScript frontend. Players connect via WebSocket for low-latency gameplay, with automatic disconnect handling through Redis presence monitoring.
+
+**Live demo:** [pong.stabalmo.pro](https://pong.stabalmo.pro)
+
 <p align="center">
   <a href="https://pong.stabalmo.pro">
     <img src="./preview-game.gif" alt="Pong gameplay preview" width="720" />
   </a>
-  <a href="https://pong.stabalmo.pro">pong.stabalmo.pro</a>
 </p>
 
+## Get started
 
+See the [Getting Started](./GETTING-STARTED.md) guide for installation instructions.
 
-## ✨ Features
+## Repositories
 
-- **Real-time Multiplayer** — Two players compete in classic Pong via WebSocket
-- **Auto Disconnect Handling** — Games automatically end when players close browser or lose connection
-- **Smart Presence** — Redis monitors active connections; seats free up on disconnect
-- **Spectator Mode** — Watch live games with history playback
-- **Modern Stack** — Go backend, vanilla JS frontend, Centrifugo v5 + Redis (ElasticSearch)
+| Repository | Description |
+|---|---|
+| [frontend](https://github.com/PongCentrifugo/frontend) | Vanilla JavaScript game client with canvas rendering and Centrifugo WebSocket integration |
+| [backend](https://github.com/PongCentrifugo/backend) | Go REST API handling game logic, JWT authentication, and Redis presence monitoring |
+| [iac](https://github.com/PongCentrifugo/iac) | Infrastructure as Code for Redis and Centrifugo services |
+| [terraform](https://github.com/PongCentrifugo/terraform) | AWS infrastructure provisioning with EKS, ElastiCache Redis, S3, and CloudFront |
 
----
+## Next steps
 
-## 🏗️ Architecture
+- Read the [Technical Architecture Guide](https://github.com/PongCentrifugo/.github/blob/main/TECHNICAL-ARCHITECTURE.md) for in-depth documentation on how Centrifugo, Redis, and Backend work together.
+- Learn about [Centrifugo](https://centrifugal.dev/) real-time messaging server.
+- Browse the backend API in the [backend repository](https://github.com/PongCentrifugo/backend).
 
-```
-┌─────────────┐      WebSocket       ┌──────────────┐
-│   Frontend  │ ◄──────────────────► │  Centrifugo  │
-│  (Vanilla)  │                      │    (v5)      │
-└─────────────┘                      └──────┬───────┘
-                                            │
-                  ┌──────────────────┬──────┴─────────────────┐
-                  │                  │                        │
-            ┌─────▼─────┐      ┌──────▼────────────┐    ┌─────▼─────┐
-            │  Backend  │      │  Redis            │    │   Pub/Sub │
-            │   (Go)    │ ◄───►│ (ElasticSearch)   │◄───┤  Presence │
-            └───────────┘      └───────────────────┘    └───────────┘
-```
+## How it works
 
-**Flow:**
-1. Players connect → Centrifugo (JWT auth)
-2. Game state → Backend RPC calls
-3. Disconnect events → Redis pub/sub → Backend
-4. Presence monitor → Redis keys → Auto-clear seats
+Players authenticate via JWT tokens and connect to Centrifugo WebSocket channels. Game state updates flow through dedicated channels for each player position. When a player disconnects (browser close, network failure, or page refresh), the backend detects this through dual strategies: Redis pub/sub for instant leave events, and presence monitoring for stale connections. The game automatically ends and the lobby resets.
 
----
+## Development approach
 
-## 📖 Documentation
+The backend and frontend were largely written using vibe-coding (AI-assisted development). My focus was on system architecture, infrastructure design, and understanding how Centrifugo, Redis, and real-time communication work together. I'm not proficient in Go or Vue/JavaScript, but that didn't stop me from building a working multiplayer game.
 
-**[→ Technical Architecture Guide](https://github.com/PongCentrifugo/.github/blob/main/TECHNICAL-ARCHITECTURE.md)** — In-depth documentation on how Centrifugo, Redis, and Backend work together
+This approach lets you focus on what matters most — architecture decisions, SRE practices, and understanding the system as a whole — while AI handles the implementation details. Even [Linus Torvalds uses AI assistance](https://github.com/torvalds/AudioNoise/commit/71b256a7fcb0aa1250625f79838ab71b2b77b9ff) for his personal projects.
 
----
+## Contributing
 
-## 🚀 Quick Start
+Contributions are welcomed and encouraged. Pull requests welcome. For major changes, open an issue first.
 
-### Prerequisites
-- Docker & Docker Compose
-- Go 1.22+ (for local development)
-- Node.js 18+ (for frontend dev)
+## About
 
-### Start Services
+A real-time multiplayer Pong implementation demonstrating WebSocket-based game architecture with Centrifugo, Go, and vanilla JavaScript.
 
-```bash
-# Clone required repos
-git clone https://github.com/PongCentrifugo/iac
-git clone https://github.com/PongCentrifugo/backend
-git clone https://github.com/PongCentrifugo/frontend
+### Resources
 
-# 1. Redis
-cd iac/redis
-docker-compose up -d
+- [README](./README.md)
+- [Technical Architecture](https://github.com/PongCentrifugo/.github/blob/main/TECHNICAL-ARCHITECTURE.md)
+- [MIT License](./LICENSE)
+- [Security Policy](./SECURITY.md)
 
-# 2. Centrifugo
-cd ../centrifugo
-cp config.example.json config.json
-# Edit secrets in config.json
-docker-compose up -d
+### Author
 
-# 3. Backend
-cd ../../backend
-cp .env.example .env
-# Match secrets with Centrifugo
-docker-compose up -d
-
-# 4. Frontend
-cd ../frontend
-npm install
-npm run dev
-```
-
-**Play:** Open `http://localhost:5173`
-
----
-
-## 🎮 How to Play
-
-1. **Join** — Click "Join First" or "Join Second"
-2. **Wait** — Game starts when both players ready
-3. **Move** — Arrow keys or W/S to control paddle
-4. **Score** — First to 10 wins
-5. **Disconnect** — Close browser → game ends automatically
-
----
-
-## 📁 Project Structure
-
-```
-pong-centrifugo/
-├── pong-frontend/        # Vanilla JS + Vite
-│   ├── src/
-│   │   ├── game.js       # Game engine (canvas)
-│   │   ├── centrifugo.js # WebSocket client
-│   │   └── config.js     # API/WS endpoints
-│   └── index.html
-│
-├── pong-backend/         # Go REST + RPC
-│   ├── cmd/pong-api/
-│   ├── internal/
-│   │   ├── disconnect/   # Redis presence & pub/sub
-│   │   ├── game/         # Lobby & game logic
-│   │   ├── centrifugo/   # JWT tokens & publish
-│   │   └── http/         # Handlers & RPC
-│   └── go.mod
-│
-└── iac/                  # Infrastructure
-    ├── redis/            # Redis broker
-    └── centrifugo/       # WebSocket server
-```
-
----
-
-## 🔧 Configuration
-
-### Centrifugo (Redis Engine)
-```json
-{
-  "engine": "redis",
-  "redis_address": "redis://pong-redis:6379/0",
-  "presence": true,
-  "join_leave": true
-}
-```
-
-### Backend (Env)
-```bash
-REDIS_URL=redis://pong-redis:6379/0
-REDIS_PUBSUB_PATTERN=centrifugo.*
-REDIS_PRESENCE_INTERVAL=2s
-CENTRIFUGO_API_URL=http://localhost:8000/api
-```
-
----
-
-## 🧪 Testing
-
-```bash
-# Backend unit tests
-cd pong-backend
-go test ./...
-
-# Integration test (requires services running)
-# Join two players, close one browser tab → game ends
-```
-
----
-
-## 🌟 Key Features Explained
-
-### Disconnect Detection (Dual Strategy)
-
-1. **Redis Pub/Sub** — Instant leave events from Centrifugo
-2. **Presence Monitor** — Polls Redis every 2s for stale connections
-
-**Why both?** Pub/sub catches clean disconnects; presence catches crashes/network failures.
-
-### Game End Conditions
-
-- ✅ Player scores 10 goals
-- ✅ Player calls `/leave` endpoint
-- ✅ Player closes browser / loses connection
-- ✅ Player refreshes page
-
-All cases → Lobby resets, history cleared.
-
----
-
-## 📊 Channels
-
-| Channel | Access | Purpose |
-|---------|--------|---------|
-| `pong_public:lobby` | Anonymous | Game events, spectators |
-| `pong_private:first` | JWT | Player 1 enemy moves |
-| `pong_private:second` | JWT | Player 2 enemy moves |
-
----
-
-## 🛠️ Development
-
-### Add Feature
-```bash
-# Backend: Add handler in internal/http/
-# Frontend: Update game.js or centrifugo.js
-# IaC: Modify docker-compose.yml
-```
-
-### Debug
-- **Backend logs:** `docker logs pong-api -f`
-- **Centrifugo:** `http://localhost:8000/` (admin panel)
-- **Redis:** `docker exec pong-redis redis-cli MONITOR`
-
-
-
----
-
-## 📝 License
-
-See [MIT License](./LICENSE).
-
----
-
-## 🤝 Contributing
-
-Pull requests welcome! For major changes, open an issue first.
-If you like this project, please ⭐ the repo, follow it, and follow my GitHub: [@Stabalmo](https://github.com/Stabalmo).
-
-**Created by:** [Danila Alferov](https://www.linkedin.com/in/stabalmo)
-
----
-
-**Built with ❤️ using Centrifugo, Go, and vanilla JavaScript**
+Created by [Danila Alferov](https://stabalmo.pro) ([LinkedIn](https://www.linkedin.com/in/stabalmo), [@Stabalmo](https://github.com/Stabalmo))
